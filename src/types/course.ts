@@ -16,3 +16,8 @@ export interface Course {
   endDate: string // 강의 종료일
   instructor: string // 담당 강사명
 }
+
+export interface CourseListResponse {
+  courses: Course[] // 강의 목록  
+  categories: CourseCategory[] // 강의 카테고리 목록
+}
