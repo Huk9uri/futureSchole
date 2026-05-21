@@ -1,4 +1,4 @@
-import type { Course, CourseCategory } from "../types/course"
+import type { Course, CourseCategory } from "@/types/course"
 
 export const mockCourseCategories: CourseCategory[] = [
   "development",

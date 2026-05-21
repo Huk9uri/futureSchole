@@ -1,10 +1,10 @@
-import { mockCourseCategories, mockCourses } from "../mocks/courses"
+import { mockCourseCategories, mockCourses } from "@/mocks/courses"
 import type {
   Course,
   CourseCategory,
   CourseListResponse,
-} from "../types/course"
-import { delay } from "../utils/delay"
+} from "@/types/course"
+import { delay } from "@/utils/delay"
 
 const COURSE_API_DELAY_MS = 500
 
