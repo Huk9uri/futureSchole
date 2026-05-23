@@ -39,6 +39,24 @@ export type EnrollmentFormData =
   | PersonalEnrollmentRequest
   | GroupEnrollmentRequest
 
+export interface EnrollmentFormValues {
+  courseId: string // 신청할 강의 고유 식별자
+  type: EnrollmentType // 수강 신청 유형
+  applicant: {
+    name: string // 신청자 이름
+    email: string // 신청자 이메일
+    phone: string // 신청자 전화번호
+    motivation: string // 수강 동기
+  }
+  agreedToTerms: boolean // 약관 동의 여부
+  group: {
+    organizationName: string // 단체명
+    headCount: number // 신청 인원 수
+    participants: GroupParticipant[] // 참가자 명단
+    contactPerson: string // 단체 담당자명
+  }
+}
+
 export interface EnrollmentResponse {
   enrollmentId: string // 수강 신청 고유 식별자
   status: "confirmed" | "pending" // 수강 신청 처리 상태
