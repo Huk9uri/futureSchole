@@ -4,6 +4,7 @@ import { Button } from "@/components/common/Button"
 import { CourseSelectStep } from "@/components/enrollment/CourseSelectStep"
 import { EnrollmentTypeModal } from "@/components/enrollment/EnrollmentTypeModal"
 import { StepIndicator } from "@/components/enrollment/StepIndicator"
+import { StudentInfoStep } from "@/components/enrollment/StudentInfoStep"
 import type { Course } from "@/types/course"
 import type { EnrollmentType } from "@/types/enrollment"
 
@@ -64,26 +65,11 @@ export const EnrollmentPage = () => {
             />
           )}
 
-          {currentStep === 2 && (
-            <div className="space-y-3">
-              <h2 className="text-xl font-semibold text-slate-900">
-                수강 신청 정보 입력
-              </h2>
-              <p className="text-sm leading-6 text-slate-600">
-                신청 정보 입력 단계는 다음 작업에서 구현합니다.
-              </p>
-              {selectedCourse && (
-                <div className="space-y-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-                  <p>선택한 강의: {selectedCourse.title}</p>
-                  {enrollmentType && (
-                    <p>
-                      신청 유형:{" "}
-                      {enrollmentType === "personal" ? "개인 신청" : "단체 신청"}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+          {currentStep === 2 && selectedCourse && enrollmentType && (
+            <StudentInfoStep
+              enrollmentType={enrollmentType}
+              selectedCourse={selectedCourse}
+            />
           )}
 
           {currentStep === 3 && (
