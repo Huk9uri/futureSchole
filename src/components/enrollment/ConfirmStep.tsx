@@ -3,13 +3,16 @@ import { useFormContext } from "react-hook-form"
 
 import { Button } from "@/components/common/Button"
 import { ErrorMessage } from "@/components/common/ErrorMessage"
+import { ConfirmApplicantSummary } from "@/components/enrollment/ConfirmApplicantSummary"
+import { ConfirmCourseSummary } from "@/components/enrollment/ConfirmCourseSummary"
+import { ConfirmGroupSummary } from "@/components/enrollment/ConfirmGroupSummary"
+import { ConfirmPriceSummary } from "@/components/enrollment/ConfirmPriceSummary"
 import { EnrollmentSuccessModal } from "@/components/enrollment/EnrollmentSuccessModal"
 import { useCreateEnrollmentMutation } from "@/hooks/mutations/useCreateEnrollmentMutation"
 import type { Course } from "@/types/course"
 import type { EnrollmentFormValues, ErrorResponse } from "@/types/enrollment"
 import { getApiErrorResponse } from "@/utils/apiError"
 import { createEnrollmentPayload } from "@/utils/enrollment"
-import { formatCoursePeriod, formatPrice } from "@/utils/format"
 
 interface ConfirmStepProps {
   onComplete: () => void
@@ -69,137 +72,23 @@ export const ConfirmStep = ({ onComplete, selectedCourse }: ConfirmStepProps) =>
         </p>
       </div>
 
-      <section className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-        <h3 className="text-base font-semibold text-slate-900">선택한 강의</h3>
-        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="text-slate-500">강의명</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {selectedCourse.title}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">강사</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {selectedCourse.instructor}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">기간</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {formatCoursePeriod(selectedCourse.startDate, selectedCourse.endDate)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">수강료</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {formatPrice(selectedCourse.price)}
-            </dd>
-          </div>
-        </dl>
-      </section>
+      <ConfirmCourseSummary selectedCourse={selectedCourse} />
 
-      <section className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-        <h3 className="text-base font-semibold text-slate-900">신청 정보</h3>
-        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="text-slate-500">신청 유형</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {isGroupEnrollment ? "단체 신청" : "개인 신청"}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">신청자</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {formValues.applicant.name}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">이메일</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {formValues.applicant.email}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">전화번호</dt>
-            <dd className="mt-1 font-semibold text-slate-900">
-              {formValues.applicant.phone}
-            </dd>
-          </div>
-        </dl>
-
-        {formValues.applicant.motivation && (
-          <div className="mt-4 rounded-md bg-white p-4 text-sm leading-6 text-slate-700">
-            <p className="font-semibold text-slate-900">수강 동기</p>
-            <p className="mt-2">{formValues.applicant.motivation}</p>
-          </div>
-        )}
-      </section>
+      <ConfirmApplicantSummary
+        applicant={formValues.applicant}
+        isGroupEnrollment={isGroupEnrollment}
+      />
 
       {isGroupEnrollment && (
-        <section className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-          <h3 className="text-base font-semibold text-slate-900">단체 정보</h3>
-          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-slate-500">단체명</dt>
-              <dd className="mt-1 font-semibold text-slate-900">
-                {formValues.group.organizationName}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">신청 인원 수</dt>
-              <dd className="mt-1 font-semibold text-slate-900">
-                {formValues.group.headCount}명
-              </dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">단체 담당자</dt>
-              <dd className="mt-1 font-semibold text-slate-900">
-                {formValues.group.contactPerson}
-              </dd>
-            </div>
-          </dl>
-
-          <div className="mt-4 space-y-3">
-            <h4 className="text-sm font-semibold text-slate-800">
-              참가자 명단
-            </h4>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {formValues.group.participants.map((participant, index) => (
-                <div
-                  className="rounded-md border border-slate-200 bg-white p-4 text-sm"
-                  key={`${participant.email}-${index}`}
-                >
-                  <p className="font-semibold text-slate-900">
-                    참가자 {index + 1}
-                  </p>
-                  <p className="mt-2 text-slate-700">{participant.name}</p>
-                  <p className="mt-1 text-slate-500">{participant.email}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ConfirmGroupSummary group={formValues.group} />
       )}
 
-      <section className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-base font-semibold text-emerald-950">
-              최종 신청 금액
-            </h3>
-            {isGroupEnrollment && (
-              <p className="mt-1 text-sm text-emerald-700">
-                {formatPrice(selectedCourse.price)} × {formValues.group.headCount}
-                명
-              </p>
-            )}
-          </div>
-          <p className="text-2xl font-bold text-emerald-700">
-            {formatPrice(totalPrice)}
-          </p>
-        </div>
-      </section>
+      <ConfirmPriceSummary
+        headCount={formValues.group.headCount}
+        isGroupEnrollment={isGroupEnrollment}
+        price={selectedCourse.price}
+        totalPrice={totalPrice}
+      />
 
       {createEnrollmentMutation.isError && (
         <ErrorMessage
