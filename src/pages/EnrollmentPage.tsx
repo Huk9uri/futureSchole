@@ -98,12 +98,24 @@ export const EnrollmentPage = () => {
   }
 
   const handleSelectEnrollmentType = (type: EnrollmentType) => {
+    const selectedCourseId = selectedCourse?.id ?? ""
+    const currentFormValues = form.getValues()
+    const shouldKeepCurrentFormValues =
+      currentFormValues.courseId === selectedCourseId &&
+      currentFormValues.type === type
+
     setEnrollmentType(type)
     form.reset(
-      createDefaultEnrollmentFormValues({
-        courseId: selectedCourse?.id ?? "",
-        type,
-      }),
+      shouldKeepCurrentFormValues
+        ? {
+            ...currentFormValues,
+            courseId: selectedCourseId,
+            type,
+          }
+        : createDefaultEnrollmentFormValues({
+            courseId: selectedCourseId,
+            type,
+          }),
     )
     setIsEnrollmentTypeModalOpen(false)
     setCurrentStep(2)
