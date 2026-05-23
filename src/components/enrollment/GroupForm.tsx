@@ -5,6 +5,7 @@ import { Input } from "@/components/common/Input"
 import type { EnrollmentFormValues } from "@/types/enrollment"
 
 const MIN_GROUP_HEAD_COUNT = 2
+const MAX_GROUP_HEAD_COUNT = 10
 
 export const GroupForm = () => {
   const {
@@ -23,7 +24,10 @@ export const GroupForm = () => {
   })
 
   useEffect(() => {
-    const nextHeadCount = Math.max(Number(headCount) || 0, MIN_GROUP_HEAD_COUNT)
+    const nextHeadCount = Math.min(
+      Math.max(Number(headCount) || 0, MIN_GROUP_HEAD_COUNT),
+      MAX_GROUP_HEAD_COUNT,
+    )
 
     if (fields.length < nextHeadCount) {
       Array.from({ length: nextHeadCount - fields.length }).forEach(() => {
@@ -56,6 +60,7 @@ export const GroupForm = () => {
             error={errors.applicant?.name?.message}
             id="group-applicant-name"
             label="이름"
+            maxLength={20}
             placeholder="홍길동"
             {...register("applicant.name")}
           />
@@ -71,6 +76,7 @@ export const GroupForm = () => {
             error={errors.applicant?.phone?.message}
             id="group-applicant-phone"
             label="전화번호"
+            maxLength={13}
             placeholder="010-1234-5678"
             type="tel"
             {...register("applicant.phone")}
@@ -87,6 +93,7 @@ export const GroupForm = () => {
           <textarea
             className="min-h-28 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
             id="group-applicant-motivation"
+            maxLength={300}
             placeholder="강의를 신청하는 이유를 입력해 주세요."
             {...register("applicant.motivation")}
           />
@@ -112,6 +119,7 @@ export const GroupForm = () => {
             error={errors.group?.headCount?.message}
             id="group-head-count"
             label="신청 인원 수"
+            max={MAX_GROUP_HEAD_COUNT}
             min={MIN_GROUP_HEAD_COUNT}
             type="number"
             {...register("group.headCount", {
@@ -121,6 +129,10 @@ export const GroupForm = () => {
 
                 if (value < MIN_GROUP_HEAD_COUNT) {
                   setValue("group.headCount", MIN_GROUP_HEAD_COUNT)
+                }
+
+                if (value > MAX_GROUP_HEAD_COUNT) {
+                  setValue("group.headCount", MAX_GROUP_HEAD_COUNT)
                 }
               },
             })}
@@ -162,6 +174,7 @@ export const GroupForm = () => {
                   error={errors.group?.participants?.[index]?.name?.message}
                   id={`group-participant-${index}-name`}
                   label="이름"
+                  maxLength={20}
                   placeholder="참가자 이름"
                   {...register(`group.participants.${index}.name`)}
                 />
