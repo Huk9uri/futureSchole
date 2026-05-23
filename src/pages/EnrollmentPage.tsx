@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -48,6 +48,24 @@ export const EnrollmentPage = () => {
   const [enrollmentType, setEnrollmentType] = useState<EnrollmentType>()
   const [isEnrollmentTypeModalOpen, setIsEnrollmentTypeModalOpen] =
     useState(false)
+  const hasEnrollmentProgress = Boolean(selectedCourse && enrollmentType)
+
+  useEffect(() => {
+    if (!hasEnrollmentProgress) {
+      return
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ""
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [hasEnrollmentProgress])
 
   const handleSelectCourse = (course: Course) => {
     setSelectedCourse(course)
@@ -79,6 +97,12 @@ export const EnrollmentPage = () => {
   }
 
   const handlePreviousStep = () => {
+    if (currentStep === 2) {
+      setSelectedCourse(undefined)
+      setEnrollmentType(undefined)
+      setIsEnrollmentTypeModalOpen(false)
+    }
+
     setCurrentStep((step) => Math.max(step - 1, FIRST_STEP))
   }
 
