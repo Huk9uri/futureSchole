@@ -1,10 +1,169 @@
+import { useEffect } from "react"
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
+
+import { Input } from "@/components/common/Input"
+import type { EnrollmentFormValues } from "@/types/enrollment"
+
+const MIN_GROUP_HEAD_COUNT = 2
+
 export const GroupForm = () => {
+  const { control, register, setValue } = useFormContext<EnrollmentFormValues>()
+  const headCount = useWatch({
+    control,
+    name: "group.headCount",
+  })
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "group.participants",
+  })
+
+  useEffect(() => {
+    const nextHeadCount = Math.max(Number(headCount) || 0, MIN_GROUP_HEAD_COUNT)
+
+    if (fields.length < nextHeadCount) {
+      Array.from({ length: nextHeadCount - fields.length }).forEach(() => {
+        append({ name: "", email: "" })
+      })
+    }
+
+    if (fields.length > nextHeadCount) {
+      Array.from({ length: fields.length - nextHeadCount }).forEach(() => {
+        remove(fields.length - 1)
+      })
+    }
+  }, [append, fields.length, headCount, remove])
+
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-      <h3 className="text-base font-semibold text-slate-900">단체 신청 정보</h3>
-      <p className="mt-2 text-sm leading-6 text-slate-600">
-        단체 신청 입력 폼은 다음 작업에서 구현합니다.
-      </p>
+    <div className="space-y-6 rounded-lg border border-slate-200 bg-slate-50 p-5">
+      <div>
+        <h3 className="text-base font-semibold text-slate-900">
+          단체 신청 정보
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          단체 정보와 참가자 명단을 입력해 주세요.
+        </p>
+      </div>
+
+      <section className="space-y-4">
+        <h4 className="text-sm font-semibold text-slate-800">신청자 정보</h4>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            id="group-applicant-name"
+            label="이름"
+            placeholder="홍길동"
+            {...register("applicant.name")}
+          />
+          <Input
+            id="group-applicant-email"
+            label="이메일"
+            placeholder="name@example.com"
+            type="email"
+            {...register("applicant.email")}
+          />
+          <Input
+            id="group-applicant-phone"
+            label="전화번호"
+            placeholder="010-1234-5678"
+            type="tel"
+            {...register("applicant.phone")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            className="block text-sm font-medium text-slate-700"
+            htmlFor="group-applicant-motivation"
+          >
+            수강 동기
+          </label>
+          <textarea
+            className="min-h-28 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+            id="group-applicant-motivation"
+            placeholder="강의를 신청하는 이유를 입력해 주세요."
+            {...register("applicant.motivation")}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h4 className="text-sm font-semibold text-slate-800">단체 정보</h4>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            id="group-organization-name"
+            label="단체명"
+            placeholder="퓨처스콜레"
+            {...register("group.organizationName")}
+          />
+          <Input
+            id="group-head-count"
+            label="신청 인원 수"
+            min={MIN_GROUP_HEAD_COUNT}
+            type="number"
+            {...register("group.headCount", {
+              setValueAs: (value) => Number(value),
+              onBlur: (event) => {
+                const value = Number(event.target.value)
+
+                if (value < MIN_GROUP_HEAD_COUNT) {
+                  setValue("group.headCount", MIN_GROUP_HEAD_COUNT)
+                }
+              },
+            })}
+          />
+          <Input
+            id="group-contact-person"
+            label="단체 담당자명"
+            placeholder="김담당"
+            {...register("group.contactPerson")}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h4 className="text-sm font-semibold text-slate-800">참가자 명단</h4>
+          <p className="mt-1 text-sm text-slate-600">
+            신청 인원 수에 맞춰 참가자 정보를 입력해 주세요.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {fields.map((field, index) => (
+            <div
+              className="rounded-md border border-slate-200 bg-white p-4"
+              key={field.id}
+            >
+              <p className="text-sm font-semibold text-slate-700">
+                참가자 {index + 1}
+              </p>
+              <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                <Input
+                  id={`group-participant-${index}-name`}
+                  label="이름"
+                  placeholder="참가자 이름"
+                  {...register(`group.participants.${index}.name`)}
+                />
+                <Input
+                  id={`group-participant-${index}-email`}
+                  label="이메일"
+                  placeholder="participant@example.com"
+                  type="email"
+                  {...register(`group.participants.${index}.email`)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <label className="flex items-start gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+        <input
+          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+          type="checkbox"
+          {...register("agreedToTerms")}
+        />
+        <span>수강 신청 안내 및 개인정보 수집에 동의합니다.</span>
+      </label>
     </div>
   )
 }
