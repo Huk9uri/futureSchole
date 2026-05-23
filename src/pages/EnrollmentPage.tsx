@@ -14,30 +14,31 @@ import type { EnrollmentFormValues, EnrollmentType } from "@/types/enrollment"
 
 const FIRST_STEP = 1
 const LAST_STEP = 3
+const DEFAULT_ENROLLMENT_FORM_VALUES: EnrollmentFormValues = {
+  courseId: "",
+  type: "personal",
+  applicant: {
+    name: "",
+    email: "",
+    phone: "",
+    motivation: "",
+  },
+  agreedToTerms: false,
+  group: {
+    organizationName: "",
+    headCount: 2,
+    participants: [
+      { name: "", email: "" },
+      { name: "", email: "" },
+    ],
+    contactPerson: "",
+  },
+}
 
 export const EnrollmentPage = () => {
   const form = useForm<EnrollmentFormValues>({
     resolver: zodResolver(enrollmentFormSchema),
-    defaultValues: {
-      courseId: "",
-      type: "personal",
-      applicant: {
-        name: "",
-        email: "",
-        phone: "",
-        motivation: "",
-      },
-      agreedToTerms: false,
-      group: {
-        organizationName: "",
-        headCount: 2,
-        participants: [
-          { name: "", email: "" },
-          { name: "", email: "" },
-        ],
-        contactPerson: "",
-      },
-    },
+    defaultValues: DEFAULT_ENROLLMENT_FORM_VALUES,
   })
   const [currentStep, setCurrentStep] = useState(FIRST_STEP)
   const [selectedCourse, setSelectedCourse] = useState<Course>()
@@ -95,6 +96,14 @@ export const EnrollmentPage = () => {
     setCurrentStep((step) => Math.min(step + 1, LAST_STEP))
   }
 
+  const handleCompleteEnrollment = () => {
+    form.reset(DEFAULT_ENROLLMENT_FORM_VALUES)
+    setSelectedCourse(undefined)
+    setEnrollmentType(undefined)
+    setIsEnrollmentTypeModalOpen(false)
+    setCurrentStep(FIRST_STEP)
+  }
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
       <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10 sm:px-8">
@@ -132,7 +141,10 @@ export const EnrollmentPage = () => {
             )}
 
             {currentStep === 3 && selectedCourse && (
-              <ConfirmStep selectedCourse={selectedCourse} />
+              <ConfirmStep
+                onComplete={handleCompleteEnrollment}
+                selectedCourse={selectedCourse}
+              />
             )}
           </section>
         </FormProvider>

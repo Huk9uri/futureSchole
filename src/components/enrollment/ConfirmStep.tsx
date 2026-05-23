@@ -1,7 +1,9 @@
+import { useState } from "react"
 import { useFormContext } from "react-hook-form"
 
 import { Button } from "@/components/common/Button"
 import { ErrorMessage } from "@/components/common/ErrorMessage"
+import { EnrollmentSuccessModal } from "@/components/enrollment/EnrollmentSuccessModal"
 import { useCreateEnrollmentMutation } from "@/hooks/mutations/useCreateEnrollmentMutation"
 import type { Course } from "@/types/course"
 import type { EnrollmentFormValues, ErrorResponse } from "@/types/enrollment"
@@ -10,6 +12,7 @@ import { createEnrollmentPayload } from "@/utils/enrollment"
 import { formatCoursePeriod, formatPrice } from "@/utils/format"
 
 interface ConfirmStepProps {
+  onComplete: () => void
   selectedCourse: Course
 }
 
@@ -28,9 +31,10 @@ const getEnrollmentErrorMessage = (errorResponse?: ErrorResponse) => {
   return ENROLLMENT_ERROR_MESSAGES[errorResponse.code] ?? errorResponse.message
 }
 
-export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
+export const ConfirmStep = ({ onComplete, selectedCourse }: ConfirmStepProps) => {
   const { getValues } = useFormContext<EnrollmentFormValues>()
   const createEnrollmentMutation = useCreateEnrollmentMutation()
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const formValues = getValues()
   const isGroupEnrollment = formValues.type === "group"
   const totalPrice = isGroupEnrollment
@@ -47,7 +51,11 @@ export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
   const handleSubmitEnrollment = () => {
     const payload = createEnrollmentPayload(getValues())
 
-    createEnrollmentMutation.mutate(payload)
+    createEnrollmentMutation.mutate(payload, {
+      onSuccess: () => {
+        setIsSuccessModalOpen(true)
+      },
+    })
   }
 
   return (
@@ -193,34 +201,6 @@ export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
         </div>
       </section>
 
-      {createEnrollmentMutation.isSuccess && createEnrollmentMutation.data && (
-        <section className="rounded-lg border border-emerald-200 bg-white p-5">
-          <h3 className="text-base font-semibold text-emerald-800">
-            수강 신청이 완료되었습니다.
-          </h3>
-          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-            <div>
-              <dt className="text-slate-500">신청 번호</dt>
-              <dd className="mt-1 font-semibold text-slate-900">
-                {createEnrollmentMutation.data.enrollmentId}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">처리 상태</dt>
-              <dd className="mt-1 font-semibold text-slate-900">
-                {createEnrollmentMutation.data.status}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">접수 일시</dt>
-              <dd className="mt-1 font-semibold text-slate-900">
-                {createEnrollmentMutation.data.enrolledAt}
-              </dd>
-            </div>
-          </dl>
-        </section>
-      )}
-
       {createEnrollmentMutation.isError && (
         <ErrorMessage
           details={enrollmentErrorDetails}
@@ -234,9 +214,16 @@ export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
           isLoading={createEnrollmentMutation.isPending}
           onClick={handleSubmitEnrollment}
         >
-          신청 제출
+          {createEnrollmentMutation.isSuccess ? "제출 완료" : "신청 제출"}
         </Button>
       </div>
+
+      {isSuccessModalOpen && createEnrollmentMutation.data && (
+        <EnrollmentSuccessModal
+          enrollment={createEnrollmentMutation.data}
+          onClose={onComplete}
+        />
+      )}
     </div>
   )
 }
