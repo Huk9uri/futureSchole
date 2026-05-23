@@ -57,19 +57,16 @@ export const CourseCard = ({
   )
 
   return (
-    <button
+    <article
       className={clsx(
         "group overflow-hidden rounded-lg border bg-white text-left shadow-sm transition",
-        "hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
+        "hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md",
         capacityStatus.isFull &&
-          "cursor-not-allowed opacity-70 hover:translate-y-0 hover:border-slate-200 hover:shadow-sm",
+          "opacity-70 hover:translate-y-0 hover:border-slate-200 hover:shadow-sm",
         isSelected
           ? "border-emerald-500 ring-2 ring-emerald-100"
           : "border-slate-200",
       )}
-      disabled={capacityStatus.isFull}
-      onClick={() => onSelectCourse(course)}
-      type="button"
     >
       <div
         className={clsx(
@@ -143,25 +140,28 @@ export const CourseCard = ({
           <span className="text-lg font-bold text-slate-950">
             {course.price.toLocaleString()}원
           </span>
-          <span
+          <button
             className={clsx(
               "rounded-md px-3 py-2 text-sm font-semibold transition-colors",
               capacityStatus.isFull &&
                 "cursor-not-allowed bg-slate-100 text-slate-500",
               isSelected
-                ? "cursor-pointer bg-emerald-600 text-white"
+                ? "cursor-pointer bg-emerald-600 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                 : !capacityStatus.isFull &&
-                    "cursor-pointer bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100",
+                    "cursor-pointer bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
             )}
+            disabled={capacityStatus.isFull}
+            onClick={() => onSelectCourse(course)}
+            type="button"
           >
             {capacityStatus.isFull
               ? "신청 마감"
               : isSelected
                 ? "선택됨"
                 : "신청하기"}
-          </span>
+          </button>
         </div>
       </div>
-    </button>
+    </article>
   )
 }
