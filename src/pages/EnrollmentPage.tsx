@@ -14,9 +14,12 @@ import type { EnrollmentFormValues, EnrollmentType } from "@/types/enrollment"
 
 const FIRST_STEP = 1
 const LAST_STEP = 3
-const DEFAULT_ENROLLMENT_FORM_VALUES: EnrollmentFormValues = {
-  courseId: "",
-  type: "personal",
+
+const createDefaultEnrollmentFormValues = (
+  values?: Partial<Pick<EnrollmentFormValues, "courseId" | "type">>,
+): EnrollmentFormValues => ({
+  courseId: values?.courseId ?? "",
+  type: values?.type ?? "personal",
   applicant: {
     name: "",
     email: "",
@@ -33,12 +36,12 @@ const DEFAULT_ENROLLMENT_FORM_VALUES: EnrollmentFormValues = {
     ],
     contactPerson: "",
   },
-}
+})
 
 export const EnrollmentPage = () => {
   const form = useForm<EnrollmentFormValues>({
     resolver: zodResolver(enrollmentFormSchema),
-    defaultValues: DEFAULT_ENROLLMENT_FORM_VALUES,
+    defaultValues: createDefaultEnrollmentFormValues(),
   })
   const [currentStep, setCurrentStep] = useState(FIRST_STEP)
   const [selectedCourse, setSelectedCourse] = useState<Course>()
@@ -53,8 +56,12 @@ export const EnrollmentPage = () => {
 
   const handleSelectEnrollmentType = (type: EnrollmentType) => {
     setEnrollmentType(type)
-    form.setValue("type", type)
-    form.setValue("courseId", selectedCourse?.id ?? "")
+    form.reset(
+      createDefaultEnrollmentFormValues({
+        courseId: selectedCourse?.id ?? "",
+        type,
+      }),
+    )
     setIsEnrollmentTypeModalOpen(false)
     setCurrentStep(2)
   }
@@ -97,7 +104,7 @@ export const EnrollmentPage = () => {
   }
 
   const handleCompleteEnrollment = () => {
-    form.reset(DEFAULT_ENROLLMENT_FORM_VALUES)
+    form.reset(createDefaultEnrollmentFormValues())
     setSelectedCourse(undefined)
     setEnrollmentType(undefined)
     setIsEnrollmentTypeModalOpen(false)
