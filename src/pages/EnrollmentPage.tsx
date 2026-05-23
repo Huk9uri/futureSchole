@@ -63,13 +63,28 @@ export const EnrollmentPage = () => {
 
   const handleNextStep = async () => {
     if (currentStep === 2) {
-      const isValid = await form.trigger([
-        "applicant.name",
-        "applicant.email",
-        "applicant.phone",
-        "applicant.motivation",
-        "agreedToTerms",
-      ])
+      const fieldsToValidate =
+        enrollmentType === "group"
+          ? [
+              "applicant.name",
+              "applicant.email",
+              "applicant.phone",
+              "applicant.motivation",
+              "agreedToTerms",
+              "group.organizationName",
+              "group.headCount",
+              "group.contactPerson",
+              "group.participants",
+            ]
+          : [
+              "applicant.name",
+              "applicant.email",
+              "applicant.phone",
+              "applicant.motivation",
+              "agreedToTerms",
+            ]
+
+      const isValid = await form.trigger(fieldsToValidate as never)
 
       if (!isValid) {
         return
