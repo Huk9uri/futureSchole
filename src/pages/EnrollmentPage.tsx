@@ -158,6 +158,10 @@ export const EnrollmentPage = () => {
     setCurrentStep((step) => Math.min(step + 1, LAST_STEP))
   }
 
+  const handleEditEnrollmentInfo = () => {
+    setCurrentStep(2)
+  }
+
   const handleCompleteEnrollment = () => {
     removeEnrollmentDraft()
     form.reset(createDefaultEnrollmentFormValues())
@@ -206,6 +210,7 @@ export const EnrollmentPage = () => {
             {currentStep === 3 && selectedCourse && (
               <ConfirmStep
                 onComplete={handleCompleteEnrollment}
+                onEditEnrollmentInfo={handleEditEnrollmentInfo}
                 selectedCourse={selectedCourse}
               />
             )}

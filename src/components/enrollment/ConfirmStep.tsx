@@ -20,10 +20,15 @@ import {
 
 interface ConfirmStepProps {
   onComplete: () => void
+  onEditEnrollmentInfo: () => void
   selectedCourse: Course
 }
 
-export const ConfirmStep = ({ onComplete, selectedCourse }: ConfirmStepProps) => {
+export const ConfirmStep = ({
+  onComplete,
+  onEditEnrollmentInfo,
+  selectedCourse,
+}: ConfirmStepProps) => {
   const { getValues } = useFormContext<EnrollmentFormValues>()
   const createEnrollmentMutation = useCreateEnrollmentMutation()
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
@@ -64,10 +69,14 @@ export const ConfirmStep = ({ onComplete, selectedCourse }: ConfirmStepProps) =>
       <ConfirmApplicantSummary
         applicant={formValues.applicant}
         isGroupEnrollment={isGroupEnrollment}
+        onEdit={onEditEnrollmentInfo}
       />
 
       {isGroupEnrollment && (
-        <ConfirmGroupSummary group={formValues.group} />
+        <ConfirmGroupSummary
+          group={formValues.group}
+          onEdit={onEditEnrollmentInfo}
+        />
       )}
 
       <ConfirmPriceSummary
