@@ -202,7 +202,7 @@ export const EnrollmentPage = () => {
             Future Schole Enrollment
           </p>
           <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
-            다단계 수강 신청 폼
+          FE-A 다단계 수강 신청 폼
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
             강의를 선택하고 신청 정보를 입력한 뒤, 마지막 단계에서 신청
