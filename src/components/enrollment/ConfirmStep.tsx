@@ -1,7 +1,11 @@
 import { useFormContext } from "react-hook-form"
 
+import { Button } from "@/components/common/Button"
+import { ErrorMessage } from "@/components/common/ErrorMessage"
+import { useCreateEnrollmentMutation } from "@/hooks/mutations/useCreateEnrollmentMutation"
 import type { Course } from "@/types/course"
 import type { EnrollmentFormValues } from "@/types/enrollment"
+import { createEnrollmentPayload } from "@/utils/enrollment"
 import { formatCoursePeriod, formatPrice } from "@/utils/format"
 
 interface ConfirmStepProps {
@@ -10,11 +14,18 @@ interface ConfirmStepProps {
 
 export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
   const { getValues } = useFormContext<EnrollmentFormValues>()
+  const createEnrollmentMutation = useCreateEnrollmentMutation()
   const formValues = getValues()
   const isGroupEnrollment = formValues.type === "group"
   const totalPrice = isGroupEnrollment
     ? selectedCourse.price * formValues.group.headCount
     : selectedCourse.price
+
+  const handleSubmitEnrollment = () => {
+    const payload = createEnrollmentPayload(getValues())
+
+    createEnrollmentMutation.mutate(payload)
+  }
 
   return (
     <div className="space-y-6">
@@ -158,6 +169,48 @@ export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
           </p>
         </div>
       </section>
+
+      {createEnrollmentMutation.isSuccess && createEnrollmentMutation.data && (
+        <section className="rounded-lg border border-emerald-200 bg-white p-5">
+          <h3 className="text-base font-semibold text-emerald-800">
+            수강 신청이 완료되었습니다.
+          </h3>
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+            <div>
+              <dt className="text-slate-500">신청 번호</dt>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {createEnrollmentMutation.data.enrollmentId}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">처리 상태</dt>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {createEnrollmentMutation.data.status}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">접수 일시</dt>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {createEnrollmentMutation.data.enrolledAt}
+              </dd>
+            </div>
+          </dl>
+        </section>
+      )}
+
+      {createEnrollmentMutation.isError && (
+        <ErrorMessage message="수강 신청 제출에 실패했습니다. 잠시 후 다시 시도해 주세요." />
+      )}
+
+      <div className="flex justify-end">
+        <Button
+          disabled={createEnrollmentMutation.isSuccess}
+          isLoading={createEnrollmentMutation.isPending}
+          onClick={handleSubmitEnrollment}
+        >
+          신청 제출
+        </Button>
+      </div>
     </div>
   )
 }
