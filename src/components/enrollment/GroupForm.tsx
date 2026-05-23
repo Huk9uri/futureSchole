@@ -7,7 +7,12 @@ import type { EnrollmentFormValues } from "@/types/enrollment"
 const MIN_GROUP_HEAD_COUNT = 2
 
 export const GroupForm = () => {
-  const { control, register, setValue } = useFormContext<EnrollmentFormValues>()
+  const {
+    control,
+    formState: { errors },
+    register,
+    setValue,
+  } = useFormContext<EnrollmentFormValues>()
   const headCount = useWatch({
     control,
     name: "group.headCount",
@@ -48,12 +53,14 @@ export const GroupForm = () => {
         <h4 className="text-sm font-semibold text-slate-800">신청자 정보</h4>
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
+            error={errors.applicant?.name?.message}
             id="group-applicant-name"
             label="이름"
             placeholder="홍길동"
             {...register("applicant.name")}
           />
           <Input
+            error={errors.applicant?.email?.message}
             id="group-applicant-email"
             label="이메일"
             placeholder="name@example.com"
@@ -61,6 +68,7 @@ export const GroupForm = () => {
             {...register("applicant.email")}
           />
           <Input
+            error={errors.applicant?.phone?.message}
             id="group-applicant-phone"
             label="전화번호"
             placeholder="010-1234-5678"
@@ -82,6 +90,11 @@ export const GroupForm = () => {
             placeholder="강의를 신청하는 이유를 입력해 주세요."
             {...register("applicant.motivation")}
           />
+          {errors.applicant?.motivation?.message && (
+            <p className="text-sm text-red-600">
+              {errors.applicant.motivation.message}
+            </p>
+          )}
         </div>
       </section>
 
@@ -89,12 +102,14 @@ export const GroupForm = () => {
         <h4 className="text-sm font-semibold text-slate-800">단체 정보</h4>
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
+            error={errors.group?.organizationName?.message}
             id="group-organization-name"
             label="단체명"
             placeholder="퓨처스콜레"
             {...register("group.organizationName")}
           />
           <Input
+            error={errors.group?.headCount?.message}
             id="group-head-count"
             label="신청 인원 수"
             min={MIN_GROUP_HEAD_COUNT}
@@ -111,6 +126,7 @@ export const GroupForm = () => {
             })}
           />
           <Input
+            error={errors.group?.contactPerson?.message}
             id="group-contact-person"
             label="단체 담당자명"
             placeholder="김담당"
@@ -128,6 +144,11 @@ export const GroupForm = () => {
         </div>
 
         <div className="space-y-3">
+          {errors.group?.participants?.root?.message && (
+            <p className="text-sm text-red-600">
+              {errors.group.participants.root.message}
+            </p>
+          )}
           {fields.map((field, index) => (
             <div
               className="rounded-md border border-slate-200 bg-white p-4"
@@ -138,12 +159,14 @@ export const GroupForm = () => {
               </p>
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
                 <Input
+                  error={errors.group?.participants?.[index]?.name?.message}
                   id={`group-participant-${index}-name`}
                   label="이름"
                   placeholder="참가자 이름"
                   {...register(`group.participants.${index}.name`)}
                 />
                 <Input
+                  error={errors.group?.participants?.[index]?.email?.message}
                   id={`group-participant-${index}-email`}
                   label="이메일"
                   placeholder="participant@example.com"
@@ -164,6 +187,9 @@ export const GroupForm = () => {
         />
         <span>수강 신청 안내 및 개인정보 수집에 동의합니다.</span>
       </label>
+      {errors.agreedToTerms?.message && (
+        <p className="text-sm text-red-600">{errors.agreedToTerms.message}</p>
+      )}
     </div>
   )
 }
