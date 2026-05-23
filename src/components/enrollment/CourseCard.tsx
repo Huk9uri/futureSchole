@@ -91,11 +91,6 @@ export const CourseCard = ({
             {capacityStatus.label}
           </span>
         </div>
-        {isSelected && (
-          <span className="absolute right-4 top-4 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-            선택됨
-          </span>
-        )}
       </div>
 
       <div className="p-5">
@@ -151,18 +146,19 @@ export const CourseCard = ({
           <span
             className={clsx(
               "rounded-md px-3 py-2 text-sm font-semibold transition-colors",
-              capacityStatus.isFull && "bg-slate-100 text-slate-500",
+              capacityStatus.isFull &&
+                "cursor-not-allowed bg-slate-100 text-slate-500",
               isSelected
-                ? "bg-emerald-600 text-white"
+                ? "cursor-pointer bg-emerald-600 text-white"
                 : !capacityStatus.isFull &&
-                    "bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100",
+                    "cursor-pointer bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100",
             )}
           >
             {capacityStatus.isFull
               ? "신청 마감"
               : isSelected
-                ? "선택 완료"
-                : "선택하기"}
+                ? "선택됨"
+                : "신청하기"}
           </span>
         </div>
       </div>

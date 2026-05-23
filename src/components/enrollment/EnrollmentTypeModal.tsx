@@ -117,7 +117,7 @@ export const EnrollmentTypeModal = ({
           {enrollmentTypeOptions.map((option) => (
             <button
               className={clsx(
-                "flex flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white p-5 text-center transition",
+                "flex cursor-pointer flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white p-5 text-center transition",
                 "hover:border-emerald-400 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
               )}
               key={option.value}
