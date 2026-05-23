@@ -4,7 +4,10 @@ import { Input } from "@/components/common/Input"
 import type { EnrollmentFormValues } from "@/types/enrollment"
 
 export const PersonalForm = () => {
-  const { register } = useFormContext<EnrollmentFormValues>()
+  const {
+    formState: { errors },
+    register,
+  } = useFormContext<EnrollmentFormValues>()
 
   return (
     <div className="space-y-5 rounded-lg border border-slate-200 bg-slate-50 p-5">
@@ -20,12 +23,14 @@ export const PersonalForm = () => {
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
           id="personal-name"
+          error={errors.applicant?.name?.message}
           label="이름"
           placeholder="홍길동"
           {...register("applicant.name")}
         />
         <Input
           id="personal-email"
+          error={errors.applicant?.email?.message}
           label="이메일"
           placeholder="name@example.com"
           type="email"
@@ -33,6 +38,7 @@ export const PersonalForm = () => {
         />
         <Input
           id="personal-phone"
+          error={errors.applicant?.phone?.message}
           label="전화번호"
           placeholder="010-1234-5678"
           type="tel"
@@ -53,6 +59,11 @@ export const PersonalForm = () => {
           placeholder="강의를 신청하는 이유를 입력해 주세요."
           {...register("applicant.motivation")}
         />
+        {errors.applicant?.motivation?.message && (
+          <p className="text-sm text-red-600">
+            {errors.applicant.motivation.message}
+          </p>
+        )}
       </div>
 
       <label className="flex items-start gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
@@ -63,6 +74,9 @@ export const PersonalForm = () => {
         />
         <span>수강 신청 안내 및 개인정보 수집에 동의합니다.</span>
       </label>
+      {errors.agreedToTerms?.message && (
+        <p className="text-sm text-red-600">{errors.agreedToTerms.message}</p>
+      )}
     </div>
   )
 }
