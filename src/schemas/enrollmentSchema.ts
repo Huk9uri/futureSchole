@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 const KOREAN_PHONE_REGEX = /^(01[016789]-?\d{3,4}-?\d{4}|0\d{1,2}-?\d{3,4}-?\d{4})$/
-const NAME_REGEX = /^[가-힣a-zA-Z\s]+$/
+const KOREAN_NAME_REGEX = /^[가-힣]+$/
 
 export const enrollmentFormSchema = z
   .object({
@@ -13,7 +13,7 @@ export const enrollmentFormSchema = z
         .trim()
         .min(2, "이름은 2자 이상 입력해 주세요.")
         .max(20, "이름은 20자 이하로 입력해 주세요.")
-        .regex(NAME_REGEX, "이름은 한글 또는 영문으로 입력해 주세요."),
+        .regex(KOREAN_NAME_REGEX, "이름은 한글로 입력해 주세요."),
       email: z
         .string()
         .trim()
@@ -115,10 +115,10 @@ export const enrollmentFormSchema = z
         })
       }
 
-      if (participantName && !NAME_REGEX.test(participantName)) {
+      if (participantName && !KOREAN_NAME_REGEX.test(participantName)) {
         context.addIssue({
           code: "custom",
-          message: "참가자 이름은 한글 또는 영문으로 입력해 주세요.",
+          message: "참가자 이름은 한글로 입력해 주세요.",
           path: ["group", "participants", index, "name"],
         })
       }
