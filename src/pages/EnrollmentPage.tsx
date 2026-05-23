@@ -92,6 +92,25 @@ export const EnrollmentPage = () => {
     })
   }, [currentStep, enrollmentType, selectedCourse, watchedFormValues])
 
+  const hasEnrollmentProgress = Boolean(selectedCourse && enrollmentType)
+
+  useEffect(() => {
+    if (!hasEnrollmentProgress) {
+      return
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ""
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [hasEnrollmentProgress])
+
   const handleSelectCourse = (course: Course) => {
     setSelectedCourse(course)
     setIsEnrollmentTypeModalOpen(true)
@@ -122,6 +141,12 @@ export const EnrollmentPage = () => {
   }
 
   const handlePreviousStep = () => {
+    if (currentStep === 2) {
+      setSelectedCourse(undefined)
+      setEnrollmentType(undefined)
+      setIsEnrollmentTypeModalOpen(false)
+    }
+
     setCurrentStep((step) => Math.max(step - 1, FIRST_STEP))
   }
 
