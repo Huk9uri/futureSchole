@@ -29,7 +29,7 @@ export const Button = ({
         variant === "secondary" &&
           "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50",
         variant === "danger" && "bg-red-600 text-white hover:bg-red-700",
-        isDisabled && "cursor-not-allowed opacity-60",
+        isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
         className,
       )}
       disabled={isDisabled}
