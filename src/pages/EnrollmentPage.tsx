@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { FormProvider, useForm } from "react-hook-form"
+import { useEffect, useMemo, useState } from "react"
+import { FormProvider, useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { Button } from "@/components/common/Button"
@@ -8,9 +8,15 @@ import { CourseSelectStep } from "@/components/enrollment/CourseSelectStep"
 import { EnrollmentTypeModal } from "@/components/enrollment/EnrollmentTypeModal"
 import { StepIndicator } from "@/components/enrollment/StepIndicator"
 import { StudentInfoStep } from "@/components/enrollment/StudentInfoStep"
+import { mockCourses } from "@/mocks/courses"
 import { enrollmentFormSchema } from "@/schemas/enrollmentSchema"
 import type { Course } from "@/types/course"
 import type { EnrollmentFormValues, EnrollmentType } from "@/types/enrollment"
+import {
+  getEnrollmentDraft,
+  removeEnrollmentDraft,
+  saveEnrollmentDraft,
+} from "@/utils/enrollmentDraft"
 
 const FIRST_STEP = 1
 const LAST_STEP = 3
@@ -38,16 +44,53 @@ const createDefaultEnrollmentFormValues = (
   },
 })
 
+const getInitialStep = (currentStep?: number) => {
+  if (!currentStep) {
+    return FIRST_STEP
+  }
+
+  return Math.min(Math.max(currentStep, FIRST_STEP), LAST_STEP)
+}
+
 export const EnrollmentPage = () => {
+  const enrollmentDraft = useMemo(() => getEnrollmentDraft(), [])
+  const draftSelectedCourse = useMemo(
+    () =>
+      enrollmentDraft?.selectedCourseId
+        ? mockCourses.find((course) => course.id === enrollmentDraft.selectedCourseId)
+        : undefined,
+    [enrollmentDraft?.selectedCourseId],
+  )
   const form = useForm<EnrollmentFormValues>({
     resolver: zodResolver(enrollmentFormSchema),
-    defaultValues: createDefaultEnrollmentFormValues(),
+    defaultValues:
+      enrollmentDraft?.formValues ?? createDefaultEnrollmentFormValues(),
   })
-  const [currentStep, setCurrentStep] = useState(FIRST_STEP)
-  const [selectedCourse, setSelectedCourse] = useState<Course>()
-  const [enrollmentType, setEnrollmentType] = useState<EnrollmentType>()
+  const [currentStep, setCurrentStep] = useState(() =>
+    draftSelectedCourse ? getInitialStep(enrollmentDraft?.currentStep) : FIRST_STEP,
+  )
+  const [selectedCourse, setSelectedCourse] = useState<Course | undefined>(
+    draftSelectedCourse,
+  )
+  const [enrollmentType, setEnrollmentType] = useState<
+    EnrollmentType | undefined
+  >(draftSelectedCourse ? enrollmentDraft?.enrollmentType : undefined)
   const [isEnrollmentTypeModalOpen, setIsEnrollmentTypeModalOpen] =
     useState(false)
+  const watchedFormValues = useWatch({ control: form.control })
+
+  useEffect(() => {
+    if (!selectedCourse || !enrollmentType) {
+      return
+    }
+
+    saveEnrollmentDraft({
+      currentStep,
+      enrollmentType,
+      formValues: watchedFormValues as EnrollmentFormValues,
+      selectedCourseId: selectedCourse.id,
+    })
+  }, [currentStep, enrollmentType, selectedCourse, watchedFormValues])
 
   const handleSelectCourse = (course: Course) => {
     setSelectedCourse(course)
@@ -104,6 +147,7 @@ export const EnrollmentPage = () => {
   }
 
   const handleCompleteEnrollment = () => {
+    removeEnrollmentDraft()
     form.reset(createDefaultEnrollmentFormValues())
     setSelectedCourse(undefined)
     setEnrollmentType(undefined)
