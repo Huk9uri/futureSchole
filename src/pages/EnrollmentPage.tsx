@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 import { Button } from "@/components/common/Button"
 import { CourseSelectStep } from "@/components/enrollment/CourseSelectStep"
 import { EnrollmentTypeModal } from "@/components/enrollment/EnrollmentTypeModal"
 import { StepIndicator } from "@/components/enrollment/StepIndicator"
 import { StudentInfoStep } from "@/components/enrollment/StudentInfoStep"
+import { enrollmentFormSchema } from "@/schemas/enrollmentSchema"
 import type { Course } from "@/types/course"
 import type { EnrollmentFormValues, EnrollmentType } from "@/types/enrollment"
 
@@ -14,6 +16,7 @@ const LAST_STEP = 3
 
 export const EnrollmentPage = () => {
   const form = useForm<EnrollmentFormValues>({
+    resolver: zodResolver(enrollmentFormSchema),
     defaultValues: {
       courseId: "",
       type: "personal",
@@ -58,7 +61,21 @@ export const EnrollmentPage = () => {
     setCurrentStep((step) => Math.max(step - 1, FIRST_STEP))
   }
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
+    if (currentStep === 2) {
+      const isValid = await form.trigger([
+        "applicant.name",
+        "applicant.email",
+        "applicant.phone",
+        "applicant.motivation",
+        "agreedToTerms",
+      ])
+
+      if (!isValid) {
+        return
+      }
+    }
+
     setCurrentStep((step) => Math.min(step + 1, LAST_STEP))
   }
 
