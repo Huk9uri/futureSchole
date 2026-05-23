@@ -4,12 +4,28 @@ import { Button } from "@/components/common/Button"
 import { ErrorMessage } from "@/components/common/ErrorMessage"
 import { useCreateEnrollmentMutation } from "@/hooks/mutations/useCreateEnrollmentMutation"
 import type { Course } from "@/types/course"
-import type { EnrollmentFormValues } from "@/types/enrollment"
+import type { EnrollmentFormValues, ErrorResponse } from "@/types/enrollment"
+import { getApiErrorResponse } from "@/utils/apiError"
 import { createEnrollmentPayload } from "@/utils/enrollment"
 import { formatCoursePeriod, formatPrice } from "@/utils/format"
 
 interface ConfirmStepProps {
   selectedCourse: Course
+}
+
+const ENROLLMENT_ERROR_MESSAGES: Record<string, string> = {
+  COURSE_FULL: "강의 정원이 마감되었습니다. 다른 강의를 선택해 주세요.",
+  DUPLICATE_ENROLLMENT: "이미 신청한 강의입니다. 신청 정보를 확인해 주세요.",
+  INVALID_INPUT: "입력값을 다시 확인해 주세요.",
+  UNKNOWN_ERROR: "알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+}
+
+const getEnrollmentErrorMessage = (errorResponse?: ErrorResponse) => {
+  if (!errorResponse) {
+    return "수강 신청 제출에 실패했습니다. 잠시 후 다시 시도해 주세요."
+  }
+
+  return ENROLLMENT_ERROR_MESSAGES[errorResponse.code] ?? errorResponse.message
 }
 
 export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
@@ -20,6 +36,13 @@ export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
   const totalPrice = isGroupEnrollment
     ? selectedCourse.price * formValues.group.headCount
     : selectedCourse.price
+  const enrollmentErrorResponse = getApiErrorResponse(
+    createEnrollmentMutation.error,
+  )
+  const enrollmentErrorMessage = getEnrollmentErrorMessage(enrollmentErrorResponse)
+  const enrollmentErrorDetails = enrollmentErrorResponse?.details
+    ? Object.values(enrollmentErrorResponse.details)
+    : undefined
 
   const handleSubmitEnrollment = () => {
     const payload = createEnrollmentPayload(getValues())
@@ -199,7 +222,10 @@ export const ConfirmStep = ({ selectedCourse }: ConfirmStepProps) => {
       )}
 
       {createEnrollmentMutation.isError && (
-        <ErrorMessage message="수강 신청 제출에 실패했습니다. 잠시 후 다시 시도해 주세요." />
+        <ErrorMessage
+          details={enrollmentErrorDetails}
+          message={enrollmentErrorMessage}
+        />
       )}
 
       <div className="flex justify-end">
