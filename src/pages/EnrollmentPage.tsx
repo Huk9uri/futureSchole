@@ -159,7 +159,6 @@ export const EnrollmentPage = () => {
               "applicant.email",
               "applicant.phone",
               "applicant.motivation",
-              "agreedToTerms",
               "group.organizationName",
               "group.headCount",
               "group.contactPerson",
@@ -170,7 +169,6 @@ export const EnrollmentPage = () => {
               "applicant.email",
               "applicant.phone",
               "applicant.motivation",
-              "agreedToTerms",
             ]
 
       const isValid = await form.trigger(fieldsToValidate as never)

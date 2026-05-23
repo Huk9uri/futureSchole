@@ -68,18 +68,6 @@ export const PersonalForm = () => {
           </p>
         )}
       </div>
-
-      <label className="flex items-start gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-        <input
-          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-          type="checkbox"
-          {...register("agreedToTerms")}
-        />
-        <span>수강 신청 안내 및 개인정보 수집에 동의합니다.</span>
-      </label>
-      {errors.agreedToTerms?.message && (
-        <p className="text-sm text-red-600">{errors.agreedToTerms.message}</p>
-      )}
     </div>
   )
 }
