@@ -3,6 +3,7 @@ import { FormProvider, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { Button } from "@/components/common/Button"
+import { ConfirmStep } from "@/components/enrollment/ConfirmStep"
 import { CourseSelectStep } from "@/components/enrollment/CourseSelectStep"
 import { EnrollmentTypeModal } from "@/components/enrollment/EnrollmentTypeModal"
 import { StepIndicator } from "@/components/enrollment/StepIndicator"
@@ -130,15 +131,8 @@ export const EnrollmentPage = () => {
               />
             )}
 
-            {currentStep === 3 && (
-              <div className="space-y-3">
-                <h2 className="text-xl font-semibold text-slate-900">
-                  신청 내용 확인 및 제출
-                </h2>
-                <p className="text-sm leading-6 text-slate-600">
-                  신청 내용 확인 단계는 다음 작업에서 구현합니다.
-                </p>
-              </div>
+            {currentStep === 3 && selectedCourse && (
+              <ConfirmStep selectedCourse={selectedCourse} />
             )}
           </section>
         </FormProvider>
