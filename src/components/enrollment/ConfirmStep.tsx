@@ -29,7 +29,12 @@ export const ConfirmStep = ({
   onEditEnrollmentInfo,
   selectedCourse,
 }: ConfirmStepProps) => {
-  const { getValues } = useFormContext<EnrollmentFormValues>()
+  const {
+    formState: { errors },
+    getValues,
+    register,
+    trigger,
+  } = useFormContext<EnrollmentFormValues>()
   const createEnrollmentMutation = useCreateEnrollmentMutation()
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const formValues = getValues()
@@ -43,7 +48,13 @@ export const ConfirmStep = ({
   const enrollmentErrorMessage = getEnrollmentErrorMessage(enrollmentErrorResponse)
   const enrollmentErrorDetails = getEnrollmentErrorDetails(enrollmentErrorResponse)
 
-  const handleSubmitEnrollment = () => {
+  const handleSubmitEnrollment = async () => {
+    const isTermsValid = await trigger("agreedToTerms")
+
+    if (!isTermsValid) {
+      return
+    }
+
     const payload = createEnrollmentPayload(getValues())
 
     createEnrollmentMutation.mutate(payload, {
@@ -85,6 +96,22 @@ export const ConfirmStep = ({
         price={selectedCourse.price}
         totalPrice={totalPrice}
       />
+
+      <section className="rounded-lg border border-slate-200 bg-slate-50 p-5">
+        <label className="flex items-start gap-3 text-sm text-slate-700">
+          <input
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+            type="checkbox"
+            {...register("agreedToTerms")}
+          />
+          <span>수강 신청 안내 및 개인정보 수집에 동의합니다.</span>
+        </label>
+        {errors.agreedToTerms?.message && (
+          <p className="mt-2 text-sm text-red-600">
+            {errors.agreedToTerms.message}
+          </p>
+        )}
+      </section>
 
       {createEnrollmentMutation.isError && (
         <ErrorMessage
