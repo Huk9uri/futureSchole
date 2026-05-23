@@ -182,7 +182,7 @@ Zod 스키마를 UI 컴포넌트와 분리해 관리했습니다.
 
 Mock API에서 `ErrorResponse` 형태로 에러를 던지고, UI에서는 `getApiErrorResponse`, `getEnrollmentErrorMessage`, `getEnrollmentErrorDetails` 유틸로 화면 표시용 메시지로 변환합니다.
 
-이렇게 분리한 이유는 `ConfirmStep`이 에러 메시지 변환 로직을 직접 담당하지 않고 제출 흐름과 UI 조합에 집중하도록 하기 위해서입니다.
+이렇게 분리한 이유는 `ConfirmStep`이 에러 메시지 변환 로직을 직접 담당하지 않고 제출 흐름과 UI 조합에 집중하도록 하기 위함입니다.
 
 ## 미구현 / 제약사항
 
