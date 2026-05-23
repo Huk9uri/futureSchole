@@ -199,7 +199,7 @@ export const EnrollmentPage = () => {
       <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10 sm:px-8">
         <header className="mb-10">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
-            Future School Enrollment
+            Future Schole Enrollment
           </p>
           <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
             다단계 수강 신청 폼
