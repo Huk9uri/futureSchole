@@ -59,7 +59,7 @@ export const PersonalForm = () => {
           className="min-h-32 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
           id="personal-motivation"
           maxLength={300}
-          placeholder="강의를 신청하는 이유를 입력해 주세요."
+          placeholder="강의를 신청하는 이유를 입력해 주세요. (선택 사항, 최대 300자)"
           {...register("applicant.motivation")}
         />
         {errors.applicant?.motivation?.message && (
