@@ -3,15 +3,26 @@ import type { EnrollmentFormValues } from "@/types/enrollment"
 interface ConfirmApplicantSummaryProps {
   applicant: EnrollmentFormValues["applicant"]
   isGroupEnrollment: boolean
+  onEdit: () => void
 }
 
 export const ConfirmApplicantSummary = ({
   applicant,
   isGroupEnrollment,
+  onEdit,
 }: ConfirmApplicantSummaryProps) => {
   return (
     <section className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-      <h3 className="text-base font-semibold text-slate-900">신청 정보</h3>
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-base font-semibold text-slate-900">신청 정보</h3>
+        <button
+          className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          onClick={onEdit}
+          type="button"
+        >
+          수정
+        </button>
+      </div>
       <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
         <div>
           <dt className="text-slate-500">신청 유형</dt>
