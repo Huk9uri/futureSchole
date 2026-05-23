@@ -1,19 +1,35 @@
 import { z } from "zod"
 
+const KOREAN_PHONE_REGEX = /^(01[016789]-?\d{3,4}-?\d{4}|0\d{1,2}-?\d{3,4}-?\d{4})$/
+const NAME_REGEX = /^[가-힣a-zA-Z\s]+$/
+
 export const enrollmentFormSchema = z
   .object({
     courseId: z.string().min(1, "강의를 선택해 주세요."),
     type: z.enum(["personal", "group"]),
     applicant: z.object({
-      name: z.string().min(1, "이름을 입력해 주세요."),
+      name: z
+        .string()
+        .trim()
+        .min(2, "이름은 2자 이상 입력해 주세요.")
+        .max(20, "이름은 20자 이하로 입력해 주세요.")
+        .regex(NAME_REGEX, "이름은 한글 또는 영문으로 입력해 주세요."),
       email: z
         .string()
+        .trim()
         .min(1, "이메일을 입력해 주세요.")
         .email("올바른 이메일 형식으로 입력해 주세요."),
-      phone: z.string().min(1, "전화번호를 입력해 주세요."),
+      phone: z
+        .string()
+        .trim()
+        .min(1, "전화번호를 입력해 주세요.")
+        .regex(
+          KOREAN_PHONE_REGEX,
+          "한국 전화번호 형식으로 입력해 주세요. 예: 010-1234-5678",
+        ),
       motivation: z
         .string()
-        .min(10, "수강 동기는 10자 이상 입력해 주세요."),
+        .max(300, "수강 동기는 300자 이하로 입력해 주세요."),
     }),
     agreedToTerms: z
       .boolean()
@@ -46,10 +62,10 @@ export const enrollmentFormSchema = z
       })
     }
 
-    if (data.group.headCount < 2) {
+    if (data.group.headCount < 2 || data.group.headCount > 10) {
       context.addIssue({
         code: "custom",
-        message: "신청 인원 수는 2명 이상이어야 합니다.",
+        message: "신청 인원 수는 2명 이상 10명 이하로 입력해 주세요.",
         path: ["group", "headCount"],
       })
     }
@@ -73,10 +89,36 @@ export const enrollmentFormSchema = z
     const participantEmails = new Set<string>()
 
     data.group.participants.forEach((participant, index) => {
-      if (!participant.name.trim()) {
+      const participantName = participant.name.trim()
+
+      if (!participantName) {
         context.addIssue({
           code: "custom",
           message: "참가자 이름을 입력해 주세요.",
+          path: ["group", "participants", index, "name"],
+        })
+      }
+
+      if (participantName && participantName.length < 2) {
+        context.addIssue({
+          code: "custom",
+          message: "참가자 이름은 2자 이상 입력해 주세요.",
+          path: ["group", "participants", index, "name"],
+        })
+      }
+
+      if (participantName.length > 20) {
+        context.addIssue({
+          code: "custom",
+          message: "참가자 이름은 20자 이하로 입력해 주세요.",
+          path: ["group", "participants", index, "name"],
+        })
+      }
+
+      if (participantName && !NAME_REGEX.test(participantName)) {
+        context.addIssue({
+          code: "custom",
+          message: "참가자 이름은 한글 또는 영문으로 입력해 주세요.",
           path: ["group", "participants", index, "name"],
         })
       }

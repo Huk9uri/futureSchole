@@ -25,6 +25,7 @@ export const PersonalForm = () => {
           id="personal-name"
           error={errors.applicant?.name?.message}
           label="이름"
+          maxLength={20}
           placeholder="홍길동"
           {...register("applicant.name")}
         />
@@ -40,6 +41,7 @@ export const PersonalForm = () => {
           id="personal-phone"
           error={errors.applicant?.phone?.message}
           label="전화번호"
+          maxLength={13}
           placeholder="010-1234-5678"
           type="tel"
           {...register("applicant.phone")}
@@ -56,6 +58,7 @@ export const PersonalForm = () => {
         <textarea
           className="min-h-32 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
           id="personal-motivation"
+          maxLength={300}
           placeholder="강의를 신청하는 이유를 입력해 주세요."
           {...register("applicant.motivation")}
         />
