@@ -33,6 +33,11 @@ export const CourseSelectStep = ({
     setCurrentPage(1)
   }
 
+  const handleChangePage = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   if (isLoading) {
     return <Loading message="강의 목록을 불러오는 중입니다." />
   }
@@ -100,9 +105,9 @@ export const CourseSelectStep = ({
               className="flex flex-wrap items-center justify-center gap-2 pt-2"
             >
               <button
-                className="h-9 rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-9 cursor-pointer rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={currentPage === 1}
-                onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+                onClick={() => handleChangePage(Math.max(currentPage - 1, 1))}
                 type="button"
               >
                 이전
@@ -116,11 +121,11 @@ export const CourseSelectStep = ({
                     aria-current={currentPage === page ? "page" : undefined}
                     className={
                       currentPage === page
-                        ? "h-9 min-w-9 rounded-md bg-emerald-600 px-3 text-sm font-semibold text-white"
-                        : "h-9 min-w-9 rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                        ? "h-9 min-w-9 cursor-pointer rounded-md bg-emerald-600 px-3 text-sm font-semibold text-white"
+                        : "h-9 min-w-9 cursor-pointer rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                     }
                     key={page}
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => handleChangePage(page)}
                     type="button"
                   >
                     {page}
@@ -129,10 +134,10 @@ export const CourseSelectStep = ({
               })}
 
               <button
-                className="h-9 rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-9 cursor-pointer rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={currentPage === totalPages}
                 onClick={() =>
-                  setCurrentPage((page) => Math.min(page + 1, totalPages))
+                  handleChangePage(Math.min(currentPage + 1, totalPages))
                 }
                 type="button"
               >
