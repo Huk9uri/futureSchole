@@ -7,6 +7,8 @@ import { CourseCategoryFilter } from "@/components/enrollment/CourseCategoryFilt
 import { useCoursesQuery } from "@/hooks/queries/useCoursesQuery"
 import type { Course, CourseCategory } from "@/types/course"
 
+const COURSES_PER_PAGE = 6
+
 interface CourseSelectStepProps {
   selectedCourseId?: string
   onSelectCourse: (course: Course) => void
@@ -18,7 +20,18 @@ export const CourseSelectStep = ({
 }: CourseSelectStepProps) => {
   const [selectedCategory, setSelectedCategory] = useState<CourseCategory>()
   const [showAvailableOnly, setShowAvailableOnly] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   const { data, isError, isLoading } = useCoursesQuery(selectedCategory)
+
+  const handleSelectCategory = (category?: CourseCategory) => {
+    setSelectedCategory(category)
+    setCurrentPage(1)
+  }
+
+  const handleChangeAvailableOnly = (checked: boolean) => {
+    setShowAvailableOnly(checked)
+    setCurrentPage(1)
+  }
 
   if (isLoading) {
     return <Loading message="강의 목록을 불러오는 중입니다." />
@@ -35,6 +48,11 @@ export const CourseSelectStep = ({
         (course) => course.currentEnrollment < course.maxCapacity,
       )
     : data.courses
+  const totalPages = Math.ceil(filteredCourses.length / COURSES_PER_PAGE)
+  const paginatedCourses = filteredCourses.slice(
+    (currentPage - 1) * COURSES_PER_PAGE,
+    currentPage * COURSES_PER_PAGE,
+  )
 
   return (
     <div className="space-y-5">
@@ -47,7 +65,7 @@ export const CourseSelectStep = ({
 
       <CourseCategoryFilter
         categories={data.categories}
-        onSelectCategory={setSelectedCategory}
+        onSelectCategory={handleSelectCategory}
         selectedCategory={selectedCategory}
       />
 
@@ -55,23 +73,74 @@ export const CourseSelectStep = ({
         <input
           checked={showAvailableOnly}
           className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-          onChange={(event) => setShowAvailableOnly(event.target.checked)}
+          onChange={(event) =>
+            handleChangeAvailableOnly(event.target.checked)
+          }
           type="checkbox"
         />
         <span>신청 가능한 강의만 보기</span>
       </label>
 
       {filteredCourses.length > 0 ? (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filteredCourses.map((course) => (
-            <CourseCard
-              course={course}
-              isSelected={course.id === selectedCourseId}
-              key={course.id}
-              onSelectCourse={onSelectCourse}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {paginatedCourses.map((course) => (
+              <CourseCard
+                course={course}
+                isSelected={course.id === selectedCourseId}
+                key={course.id}
+                onSelectCourse={onSelectCourse}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <nav
+              aria-label="강의 목록 페이지네이션"
+              className="flex flex-wrap items-center justify-center gap-2 pt-2"
+            >
+              <button
+                className="h-9 rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+                type="button"
+              >
+                이전
+              </button>
+
+              {Array.from({ length: totalPages }, (_, index) => {
+                const page = index + 1
+
+                return (
+                  <button
+                    aria-current={currentPage === page ? "page" : undefined}
+                    className={
+                      currentPage === page
+                        ? "h-9 min-w-9 rounded-md bg-emerald-600 px-3 text-sm font-semibold text-white"
+                        : "h-9 min-w-9 rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                    }
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    type="button"
+                  >
+                    {page}
+                  </button>
+                )
+              })}
+
+              <button
+                className="h-9 rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(page + 1, totalPages))
+                }
+                type="button"
+              >
+                다음
+              </button>
+            </nav>
+          )}
+        </>
       ) : (
         <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center">
           <p className="text-sm font-semibold text-slate-800">
